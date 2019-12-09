@@ -1,9 +1,10 @@
 defmodule Gen do
-  def generate_new_text("lib/the_ghost_inside_my_house.txt" = text_file) do
+  def generate_new_text(text_file) do
     {:ok, text} = File.read(text_file)
 
     text
     |> generate_word_map()
+    |> generate_text()
   end
 
   defp generate_word_map(text) do
@@ -12,6 +13,18 @@ defmodule Gen do
     |> Stream.chunk_every(3, 1, :discard)
     |> Enum.to_list()
     |> add_or_update_pair()
+  end
+
+  defp generate_text(text_map) do
+    text_map
+    |> Enum.reduce("", fn {key, _value}, acc ->
+      acc <> " " <> key <> " " <> get_random_value(text_map, key)
+    end)
+  end
+
+  defp get_random_value(text_map, key) do
+    {:ok, value} = Map.fetch(text_map, key)
+    Enum.random(value)
   end
 
   defp add_or_update_pair(word_list) do
